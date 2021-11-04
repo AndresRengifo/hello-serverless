@@ -1,9 +1,23 @@
 pipeline{
     agent any
     stages{
-        stage('build'){
+        stage('build no test'){
             steps{
-                sh 'npm install'
+                nodejs(nodeJSInstallationName: 'nodejs'){
+                    sh 'npm install'
+                    sh 'npm rebuild'
+                    sh 'npm run build --skip-test --if--present'
+                }
+                
+            }
+        }
+        stage('build w/ test'){
+            steps{
+                nodejs(nodeJSInstallationName: 'nodejs'){
+                    sh 'npm run test:coverage'
+                    archiveArtifacts(artifacts: 'coverage/**',onlyIfSuccesful:true)
+                }
+                
             }
         }
         stage('deploy'){
